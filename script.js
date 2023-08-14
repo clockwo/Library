@@ -132,6 +132,7 @@ booksElement.addEventListener('click', ({ target }) => {
 });
 
 addButtonElement.addEventListener('click', () => {
+  clearValue();
   modalElement.showModal();
 });
 
@@ -174,7 +175,6 @@ addBookForm.addEventListener('submit', ({ target }) => {
     chosenTarget = '';
     editMode = false;
     hideOptionButtons();
-    clearValue();
     return;
   }
   const book = new Book(
