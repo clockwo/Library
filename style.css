@@ -67,6 +67,7 @@ body {
 .bookcase {
   width: min(90%, 1200px);
   margin-inline: auto;
+  position: relative;
 }
 
 .title {
@@ -131,6 +132,10 @@ body {
   display: flex;
   justify-content: center;
   gap: 1rem;
+  width: 100%;
+  position: sticky;
+  bottom: 0;
+  background-color: hsla(0, 0%, 0%, 0.5);
 }
 
 .button {
