@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Library project</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="./script.js" defer></script>
+  </head>
+  <body data-js-body>
+    <section class="bookcase">
+      <h1 class="title">Library project</h1>
+      <div class="books" data-js-books></div>
+      <div class="buttons-container">
+        <button
+          class="accent-color-red delete-button button"
+          data-js-delete-button
+          type="button"
+        >
+          Delete
+        </button>
+        <button
+          class="add-button accent-color-green button"
+          data-js-add-button
+          type="button"
+        >
+          Add
+        </button>
+        <button class="edit-button button" data-js-edit-button type="button">
+          Edit
+        </button>
+      </div>
+    </section>
+
+    <dialog class="book-modal" data-js-modal>
+      <h3 class="modal-title">Book</h3>
+      <form class="book-form" method="dialog" data-js-form>
+        <input
+          class="book-title"
+          id="book-title"
+          type="text"
+          placeholder="Title"
+          name="bookTitle"
+          required
+        />
+        <input
+          class="book-author"
+          type="text"
+          placeholder="Author"
+          name="bookAuthor"
+          required
+        />
+        <input
+          class="book-pages"
+          type="text"
+          placeholder="Amount of pages"
+          name="bookPages"
+          required
+        />
+        <div class="form-buttons">
+          <button
+            class="button accent-color-green"
+            data-js-modal-add-button
+            type="submit"
+          >
+            Add
+          </button>
+          <button
+            class="button accent-color-red"
+            data-js-modal-close-button
+            type="button"
+          >
+            Close
+          </button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>
