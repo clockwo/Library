@@ -22,9 +22,47 @@ const modalCloseButtonElement = document.querySelector(
 );
 const addBookForm = document.querySelector(selectors.addBookForm);
 
-const library = [];
-let chosenTarget = '';
-let editMode = false;
+const chosenTarget = {
+  target: null,
+  setChosenTarget: (target) => {
+    chosenTarget.target = target;
+  },
+  clearChosenTarget: () => {
+    chosenTarget.target = null;
+  },
+  getTarget: () => chosenTarget.target,
+};
+
+const editMode = {
+  mode: null,
+  enterEditMode: () => {
+    editMode.mode = true;
+  },
+  exitEditMode: () => {
+    editMode.mode = false;
+  },
+  getMode: () => editMode.mode,
+};
+
+const library = {
+  books: [],
+  addBookToLibrary: (title, author, pages) => {
+    const book = new Book(title, author, pages);
+    library.books.push(book);
+  },
+
+  deleteBookFromLibrary: (index) => {
+    library.books.splice(index, 1);
+  },
+
+  editBookInLibrary: (index, book) => {
+    library.books[index] = book;
+  },
+
+  getLastAddedBook: () => {
+    return library.books[library.books.length - 1];
+  },
+};
 
 function Book(title, author, pages, read = false) {
   this.title = title;
@@ -60,7 +98,7 @@ const authors = [
 ];
 const pages = [310, 400, 250, 281, 328, 200, 180, 634, 1225, 730];
 for (let i = 0; i < 10; i++) {
-  library.push(new Book(titles[i], authors[i], pages[i]));
+  library.books.push(new Book(titles[i], authors[i], pages[i]));
 }
 // !End
 
@@ -84,14 +122,7 @@ const createBookElement = (book) => {
   return bookElement;
 };
 
-const addBookToLibrary = () => {
-  library.push(new Book('Mandolorian', 'By Disney', 250));
-  const addedBook = library[library.length - 1];
-  const newElement = createBookElement(addedBook);
-  booksElement.appendChild(newElement);
-};
-
-const bookElementArray = library.map((book) => createBookElement(book));
+const bookElementArray = library.books.map((book) => createBookElement(book));
 
 const showOptionButtons = () => {
   editButtonElement.classList.add('show');
@@ -120,14 +151,14 @@ bookElementArray.forEach((singleBookElement) =>
 booksElement.addEventListener('click', ({ target }) => {
   if (!target.matches('.book')) return;
 
-  if (!chosenTarget) {
+  if (!chosenTarget.getTarget()) {
     target.classList.toggle('is-chosen');
     showOptionButtons();
-    chosenTarget = target;
+    chosenTarget.setChosenTarget(target);
   } else if (target.matches('.is-chosen')) {
     target.classList.toggle('is-chosen');
     hideOptionButtons();
-    chosenTarget = '';
+    chosenTarget.clearChosenTarget();
   }
 });
 
@@ -137,21 +168,21 @@ addButtonElement.addEventListener('click', () => {
 });
 
 deleteButtonElement.addEventListener('click', () => {
-  const indexOfElement = getIndexOfCurrentElement(chosenTarget);
-  library.splice(indexOfElement, 1);
-  booksElement.removeChild(chosenTarget);
-  chosenTarget = '';
+  const indexOfElement = getIndexOfCurrentElement(chosenTarget.getTarget());
+  library.deleteBookFromLibrary(indexOfElement);
+  booksElement.removeChild(chosenTarget.getTarget());
+  chosenTarget.clearChosenTarget();
   hideOptionButtons();
 });
 
 editButtonElement.addEventListener('click', () => {
-  const indexOfElement = getIndexOfCurrentElement(chosenTarget);
-  const book = library[indexOfElement];
+  const indexOfElement = getIndexOfCurrentElement(chosenTarget.getTarget());
+  const book = library.books[indexOfElement];
   modalElement.showModal();
   addBookForm.bookTitle.value = book.title;
   addBookForm.bookAuthor.value = book.author;
   addBookForm.bookPages.value = book.pages;
-  editMode = true;
+  editMode.enterEditMode();
 });
 
 modalCloseButtonElement.addEventListener('click', () => {
@@ -159,29 +190,27 @@ modalCloseButtonElement.addEventListener('click', () => {
 });
 
 addBookForm.addEventListener('submit', ({ target }) => {
-  if (editMode) {
-    const indexOfElement = getIndexOfCurrentElement(chosenTarget);
+  if (editMode.getMode()) {
+    const indexOfElement = getIndexOfCurrentElement(chosenTarget.getTarget());
     const book = new Book(
       target.bookTitle.value,
       target.bookAuthor.value,
       target.bookPages.value
     );
-    library[indexOfElement] = book;
-    console.log(library);
+    library.editBookInLibrary(indexOfElement, book);
     booksElement.replaceChild(
       createBookElement(book),
       booksElement.childNodes[indexOfElement]
     );
-    chosenTarget = '';
-    editMode = false;
+    chosenTarget.clearChosenTarget();
+    editMode.exitEditMode();
     hideOptionButtons();
     return;
   }
-  const book = new Book(
+  library.addBookToLibrary(
     target.bookTitle.value,
     target.bookAuthor.value,
     target.bookPages.value
   );
-  library.push(book);
-  booksElement.appendChild(createBookElement(book));
+  booksElement.appendChild(createBookElement(library.getLastAddedBook()));
 });
