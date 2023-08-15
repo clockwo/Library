@@ -118,6 +118,21 @@ body {
   gap: 1rem;
 }
 
+.toggle-read {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  color: white;
+}
+
+.toggle-read > input {
+  margin-top: 0;
+}
+
+.not-read {
+  margin-left: auto;
+}
+
 .form-buttons {
   display: flex;
   justify-content: space-between;

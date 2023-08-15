@@ -46,8 +46,8 @@ const editMode = {
 
 const library = {
   books: [],
-  addBookToLibrary: (title, author, pages) => {
-    const book = new Book(title, author, pages);
+  addBookToLibrary: (title, author, pages, read) => {
+    const book = new Book(title, author, pages, read);
     library.books.push(book);
   },
 
@@ -109,15 +109,26 @@ const createElement = (tag, className, innerHTML = '') => {
   return element;
 };
 
+const getSelectedValue = () => {
+  let selected = document.querySelector("input[name='isRead']:checked");
+  return selected.value === 'true';
+};
+
 const createBookElement = (book) => {
   const bookElement = createElement('div', 'book');
   const titleElement = createElement('h2', 'book-title', book.title);
   const authorElement = createElement('p', 'book-author', book.author);
-  const pagesElement = createElement('p', 'book-pages', book.pages);
+  const pagesElement = createElement('p', 'book-pages', `${book.pages} pages`);
+  const isReadElement = createElement(
+    'p',
+    'book-is-read',
+    book.read ? 'Is read' : 'Not Read'
+  );
 
   bookElement.appendChild(titleElement);
   bookElement.appendChild(authorElement);
   bookElement.appendChild(pagesElement);
+  bookElement.appendChild(isReadElement);
 
   return bookElement;
 };
@@ -195,7 +206,8 @@ addBookForm.addEventListener('submit', ({ target }) => {
     const book = new Book(
       target.bookTitle.value,
       target.bookAuthor.value,
-      target.bookPages.value
+      target.bookPages.value,
+      getSelectedValue()
     );
     library.editBookInLibrary(indexOfElement, book);
     booksElement.replaceChild(
@@ -210,7 +222,9 @@ addBookForm.addEventListener('submit', ({ target }) => {
   library.addBookToLibrary(
     target.bookTitle.value,
     target.bookAuthor.value,
-    target.bookPages.value
+    target.bookPages.value,
+    getSelectedValue()
   );
+  console.log(library);
   booksElement.appendChild(createBookElement(library.getLastAddedBook()));
 });
