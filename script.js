@@ -1,77 +1,105 @@
 const selectors = {
-  body: '[data-js-body]',
   books: '[data-js-books]',
   addButton: '[data-js-add-button]',
   editButton: '[data-js-edit-button]',
   deleteButton: '[data-js-delete-button]',
   modal: '[data-js-modal]',
-  modalAddButton: '[data-js-modal-add-button]',
   modalCloseButton: '[data-js-modal-close-button]',
   addBookForm: '[data-js-form]',
 };
 
-const bodyElement = document.querySelector(selectors.body);
 const booksElement = document.querySelector(selectors.books);
 const addButtonElement = document.querySelector(selectors.addButton);
 const editButtonElement = document.querySelector(selectors.editButton);
 const deleteButtonElement = document.querySelector(selectors.deleteButton);
 const modalElement = document.querySelector(selectors.modal);
-const modalAddButtonElement = document.querySelector(selectors.modalAddButton);
 const modalCloseButtonElement = document.querySelector(
   selectors.modalCloseButton
 );
 const addBookForm = document.querySelector(selectors.addBookForm);
 
-const chosenTarget = {
-  target: null,
-  setChosenTarget: (target) => {
+class chosenTarget {
+  static target = null;
+
+  static setChosenTarget (target)  {
     chosenTarget.target = target;
-  },
-  clearChosenTarget: () => {
+  }
+  static clearChosenTarget ()  {
     chosenTarget.target = null;
-  },
-  getTarget: () => chosenTarget.target,
-};
+  }
 
-const editMode = {
-  mode: null,
-  enterEditMode: () => {
-    editMode.mode = true;
-  },
-  exitEditMode: () => {
-    editMode.mode = false;
-  },
-  getMode: () => editMode.mode,
-};
+  static getTarget () {
+    return chosenTarget.target
+  }
 
-const library = {
-  books: [],
-  addBookToLibrary: (title, author, pages, read) => {
-    const book = new Book(title, author, pages, read);
-    library.books.push(book);
-  },
-
-  deleteBookFromLibrary: (index) => {
-    library.books.splice(index, 1);
-  },
-
-  editBookInLibrary: (index, book) => {
-    library.books[index] = book;
-  },
-
-  getLastAddedBook: () => {
-    return library.books[library.books.length - 1];
-  },
-};
-
-function Book(title, author, pages, read = false) {
-  this.title = title;
-  this.author = author;
-  this.pages = pages;
-  this.read = read;
 }
 
-// ! Delete when no longer needed (Thats just a test data)
+class editMode {
+  static mode = null;
+
+  static enterEditMode() {
+    editMode.mode = true;
+  }
+
+  static exitEditMode() {
+    editMode.mode = false
+  }
+
+  static getMode() {
+    return editMode.mode
+  }
+}
+
+class Library {
+  static books = [];
+
+  static addBookToLibrary (title, author, pages, read) {
+    const book = new Book(title, author, pages, read);
+    Library.books.push(book);
+  }
+
+  static deleteBookFromLibrary(index)  {
+    Library.books.splice(index, 1);
+  }
+
+  static editBookInLibrary (index, book)  {
+    Library.books[index] = book;
+  }
+
+  static getLastAddedBook() {
+    return Library.books[Library.books.length - 1];
+  }
+}
+
+class Book {
+  constructor(title, author, pages, read = false) {
+    this.title = title;
+    this.author = author;
+    this.pages = pages;
+    this.read = read;
+  }
+
+  getElement = () => {
+    const bookElement = createElement('div', 'book');
+    const titleElement = createElement('h2', 'book-title', this.title);
+    const authorElement = createElement('p', 'book-author', this.author);
+    const pagesElement = createElement('p', 'book-pages', `${this.pages} pages`);
+    const isReadElement = createElement(
+      'p',
+      'book-is-read',
+      this.read ? 'Is read' : 'Not Read'
+    );
+
+    bookElement.appendChild(titleElement);
+    bookElement.appendChild(authorElement);
+    bookElement.appendChild(pagesElement);
+    bookElement.appendChild(isReadElement);
+
+    return bookElement;
+  }
+}
+
+// ! Delete when no longer needed (That's just a test data)
 const titles = [
   'The Hobbit',
   'The Lord of the Rings',
@@ -98,7 +126,7 @@ const authors = [
 ];
 const pages = [310, 400, 250, 281, 328, 200, 180, 634, 1225, 730];
 for (let i = 0; i < 10; i++) {
-  library.books.push(new Book(titles[i], authors[i], pages[i]));
+  Library.books.push(new Book(titles[i], authors[i], pages[i]));
 }
 // !End
 
@@ -114,26 +142,7 @@ const getSelectedValue = () => {
   return selected.value === 'true';
 };
 
-const createBookElement = (book) => {
-  const bookElement = createElement('div', 'book');
-  const titleElement = createElement('h2', 'book-title', book.title);
-  const authorElement = createElement('p', 'book-author', book.author);
-  const pagesElement = createElement('p', 'book-pages', `${book.pages} pages`);
-  const isReadElement = createElement(
-    'p',
-    'book-is-read',
-    book.read ? 'Is read' : 'Not Read'
-  );
-
-  bookElement.appendChild(titleElement);
-  bookElement.appendChild(authorElement);
-  bookElement.appendChild(pagesElement);
-  bookElement.appendChild(isReadElement);
-
-  return bookElement;
-};
-
-const bookElementArray = library.books.map((book) => createBookElement(book));
+const bookElementArray = Library.books.map((book) => book.getElement());
 
 const showOptionButtons = () => {
   editButtonElement.classList.add('show');
@@ -180,7 +189,7 @@ addButtonElement.addEventListener('click', () => {
 
 deleteButtonElement.addEventListener('click', () => {
   const indexOfElement = getIndexOfCurrentElement(chosenTarget.getTarget());
-  library.deleteBookFromLibrary(indexOfElement);
+  Library.deleteBookFromLibrary(indexOfElement);
   booksElement.removeChild(chosenTarget.getTarget());
   chosenTarget.clearChosenTarget();
   hideOptionButtons();
@@ -188,7 +197,7 @@ deleteButtonElement.addEventListener('click', () => {
 
 editButtonElement.addEventListener('click', () => {
   const indexOfElement = getIndexOfCurrentElement(chosenTarget.getTarget());
-  const book = library.books[indexOfElement];
+  const book = Library.books[indexOfElement];
   modalElement.showModal();
   addBookForm.bookTitle.value = book.title;
   addBookForm.bookAuthor.value = book.author;
@@ -209,9 +218,9 @@ addBookForm.addEventListener('submit', ({ target }) => {
       target.bookPages.value,
       getSelectedValue()
     );
-    library.editBookInLibrary(indexOfElement, book);
+    Library.editBookInLibrary(indexOfElement, book);
     booksElement.replaceChild(
-      createBookElement(book),
+      book.getElement(),
       booksElement.childNodes[indexOfElement]
     );
     chosenTarget.clearChosenTarget();
@@ -219,12 +228,12 @@ addBookForm.addEventListener('submit', ({ target }) => {
     hideOptionButtons();
     return;
   }
-  library.addBookToLibrary(
+  Library.addBookToLibrary(
     target.bookTitle.value,
     target.bookAuthor.value,
     target.bookPages.value,
     getSelectedValue()
   );
-  console.log(library);
-  booksElement.appendChild(createBookElement(library.getLastAddedBook()));
+  console.log(Library);
+  booksElement.appendChild(Library.getLastAddedBook().getElement());
 });
